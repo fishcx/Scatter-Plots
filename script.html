@@ -1,0 +1,706 @@
+<script>
+	$(document).ready(function() {
+    
+    $('.changeItem').change(function(){
+        $('#generate').click();
+    });
+
+    $(document).keypress(function (e) {
+        var key = e.which;
+         if(key == 13)  // the enter key code
+         {
+            $('#generate').click();
+             return false;  
+          }
+    });
+    
+    $('#video-button').hide();
+    $('#plot-line').hide();
+    
+    var testing = false;
+    
+    $('#generate').click(function(){
+        if(!testing){$("#answer").hide(); $("#show-answer").val("Show Answer");}
+        $('#plot').hide();
+        $('#plot-line').hide();
+
+        var type;
+        // handles the formatting for selecting any type
+        if($("#type").val()=="any"){type = random(1,2);}
+        else{type = parseInt($("#type").val())}
+
+        generate(type);
+     });
+
+
+    $("#show-answer").click(function(){
+       if($("#answer").is(":hidden") ){
+          $("#answer").show();
+          if($('#type').val() == 2){
+              if($("#showLine").is(':checked')){
+               $('#plot').hide();
+               $('#plot-line').show();
+           }
+           else {
+               $('#plot').show();
+               $('#plot-line').hide();
+            } 
+          }
+          $("#show-answer").val("Hide Answer");
+       } else{
+         $("#answer").hide();
+         $("#show-answer").val("Show Answer");
+         if($('#type').val() == 2){
+               $('#plot').hide();
+               $('#plot-line').hide();
+          }
+        }
+    });
+
+    if(testing){ $("#answer").show();}
+    
+    $('#showLine').prop('checked', false);
+    $("#showLine").click(function(){
+        // do this for scatter plots or if the scatterplot is shown for the table
+        // That way, the show line doesn't show the scatterplot too soon
+        if($('#type').val() == 1 || $("#answer").is(":visible")){
+        if($(this).is(':checked')){
+            $('#plot-line').show();
+            $('#plot').hide();
+        } else {
+            $('#plot-line').hide();
+            $('#plot').show();
+        }
+        }
+    });
+    
+	});
+	function generate(type){
+       
+       var videoLinks = ["https://www.youtube.com/watch?v=Ex7urGJtNr8",
+                         "https://www.youtube.com/watch?v=6GbBkS1aWnQ"];
+       
+       if(videoLinks[type-1].length != 0){ 
+         $("#videoLink"). attr("href", videoLinks[type-1]);
+         $('#video-button').show();
+       }
+       else{
+         $('#video-button').hide();
+       }
+       
+       var problem = "";
+       var answer = "";
+       var a,b,c,d,e,f,g,h,x1,x2,y1,y2,slope,yint;
+       $("#generated").html("");
+       $("#answer").html("");
+       
+       switch(type) {
+
+           // Given scatter plot
+           case 1:
+           var scat = getScatter(30);
+           slope = round(scat.slope*1000)/1000;
+           yint = round(scat.yint*1000)/1000;
+           draw(slope+"x + "+yint,scat.x,scat.y,"plot-line",true,scat.xScale,scat.yScale,scat.corX,scat.corY); 
+           draw(slope+"x + "+yint,scat.x,scat.y,"plot",false,scat.xScale,scat.yScale,scat.corX,scat.corY);
+           if($("#showLine").is(':checked')){
+               $('#plot').hide();
+               $('#plot-line').show();
+           }
+           else {
+               $('#plot').show();
+               $('#plot-line').hide();
+            }   
+           problem = "Find the equation of the line of best fit and determine what the slope and \\(y\\)-intercept represent in context.";
+           answer += "Correlation: "+scat.coeff;
+           answer += "<br>Best Fit Line: \\(y = "+slope+"x + "+yint+"\\)";
+           
+           var change = ""; var incDec = "";
+           if(slope < 0){
+           
+              change = slope*-1;
+              incDec = "decreases";
+           
+           } else{
+              
+              change = slope;
+              incDec = "increases";
+              
+           }
+           answer += "<br>Slope in Context: As "+(scat.corX+" increases by 1, the "+scat.corY+" "+incDec+" by "+change).toLowerCase();
+           answer += "<br>\\(y\\)-intercept in Context: When "+(scat.corX+" is \\(0\\), "+scat.corY+" is "+yint).toLowerCase();
+           answer += "<br>\\(r \\approx "+round(scat.r*10000)/10000+"\\)";
+           break;
+           
+           // Given table
+           case 2:
+           var scat = getScatter(20);           
+           var xstring = ""; 
+           var ystring = "";
+           problem = "Find the equation of the line of best fit and determine what the slope and \\(y\\)-intercept represent in context.";
+           problem += "<p><a target='blank' href='https://drive.google.com/open?id=1kh4fy3SfXWiqD1aZUAEdupL8rar8TtAQ'>Download Grid Paper</a></p>";
+           problem += "<table border='1'>";
+           problem += "<tr><td>"+scat.corX+" \\((x)\\)</td>";
+                     
+           for(var i = 0; i < scat.x.length; i++){
+              
+              xstring += "<td>"+(scat.x[i])+"</td>";
+              ystring += "<td>"+(scat.y[i])+"</td>";
+           
+           }
+           
+           problem += xstring+"</tr><tr><td>"+scat.corY+" \\((y)\\)</td>"+ystring+"</tr>";
+           problem += "</table>";
+           
+           slope = round(scat.slope*1000)/1000;
+           yint = round(scat.yint*1000)/1000;
+           draw(slope+"x + "+yint,scat.x,scat.y,"plot-line",true,scat.xScale,scat.yScale,scat.corX,scat.corY);
+           draw(slope+"x + "+yint,scat.x,scat.y,"plot",false,scat.xScale,scat.yScale,scat.corX,scat.corY);
+           answer += "Correlation: "+scat.coeff;
+           answer += "<br>Best Fit Line: \\(y = "+slope+"x + "+yint+"\\)";
+           
+           var change = ""; var incDec = "";
+           if(slope < 0){
+           
+              change = slope*-1;
+              incDec = "decreases";
+           
+           } else{
+              
+              change = slope;
+              incDec = "increases";
+              
+           }
+           answer += "<br>Slope in Context: As "+(scat.corX+" increases by 1, the "+scat.corY+" "+incDec+" by "+change).toLowerCase();
+           answer += "<br>\\(y\\)-intercept in Context: When "+(scat.corX+" is \\(0\\), "+scat.corY+" is "+yint).toLowerCase();
+           answer += "<br>\\(r \\approx "+round(scat.r*10000)/10000+"\\)";
+           break;
+           
+       }
+            
+       $("#generated").html(doublesigns(problem));
+       $("#answer").html(doublesigns(answer));
+       renderMathInElement(document.body);
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"generated"]);
+       //MathJax.Hub.queue.Push(["Typeset",MathJax.Hub,"answer"]);
+	}
+    
+    // helper function to produce a scatterplot
+    function getScatter(dotNum){
+       
+       // number of dots on the scatter plot
+       var coords;
+       
+       switch(random(0,4)){
+       //switch(3){   // for testing
+          // strong negative
+          case 0: coords = strongNeg(dotNum); break;
+          
+          // weak negative
+          case 1: coords = weakNeg(dotNum); break;
+          
+          // no correlation
+          case 2: coords = noCorr(dotNum); break;
+          
+          // weak positive
+          case 3: coords = weakPos(dotNum); break;
+          
+          // strong positive
+          case 4: coords = strongPos(dotNum); break;       
+       }              
+       return {slope:coords.slope, yint:coords.yint, x:coords.x, y:coords.y, r:coords.r, coeff: coords.corr, corX: coords.corX, corY: coords.corY, xScale: coords.xScale, yScale: coords.yScale};
+    }    
+        
+    function strongNeg(numDots){
+       
+       // determine the range of r values for the scatter plot
+       var corr1 = -1; 
+       var corr2 = -.75; 
+       var correlation = "Strong Negative";
+       var xValues = [];
+       var yValues = [];
+       
+       var r = -2;
+       var lr;       
+       
+       // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
+       var corrX = ["Number of Absences","Chicken Age","Weekly Exercise Hours","Hours Spent Watching TV","Hours on Social Media","Age","Average Temperature (F)"];
+       var corrY = ["Exam Grade","Egg Production (%)","Chances of Heart Attack (%)","Exam Grade","Happiness","Memory","Monthly Heating Bill"];
+       
+       // this adjusts the x scale to count by this 
+       var xScaleFactor = [1,1,1,1,1,10,10];
+       
+       // this adjusts the y scale to count by this 
+       var yScaleFactor = [10,10,10,10,10,10,15];
+   
+       // pick a context index randomly from the list
+       var selected = random(0,corrX.length-1);
+       
+       // adjust this to change the corr coeff
+       var tol = 2;
+       var tempX, tempY;
+       
+       // keep generating x and y coordinates until the scatterplot is produced with a r value in the selected range
+       do{
+           
+           // pick a beginning point and an end point to force the relationship to be negative
+           var firstX = 0; // don't want it to start at (2,max) and have a steep slope -> y-int goes off the grid
+           var firstY = random(5*yScaleFactor[selected],10*yScaleFactor[selected]);
+           var lastX = random(8*xScaleFactor[selected],10*xScaleFactor[selected]);
+           var lastY = random(0,firstY-5); 
+           var slope, yInt;       
+           
+           // set the linear model based on these two points first. Then create the scatter plot based on this line
+           lr = linearRegression([firstX,lastX], [firstY,lastY]); // will reset this model later
+           slope = lr['slope']; 
+           yInt = lr['intercept']; 
+           
+           xValues = [];  // reset these each time
+           yValues = [];  // reset these each time
+           
+           for(var i = 0; i < numDots; i++){
+               
+               tempX = random(0,10*xScaleFactor[selected]);
+               xValues.push(tempX);
+               tempY = round(random(slope*tempX+yInt-tol, slope*tempX+yInt+tol)*10)/10;
+               if(tempY < 0){ tempY = -1*tempY;}
+               yValues.push(tempY);              
+           }
+       
+         lr = linearRegression(xValues, yValues);
+         slope = lr['slope'];
+         yInt = lr['intercept'];
+         r = Math.sqrt(lr['r2']);
+         if(slope < 0){ r = r*-1};
+       
+       }
+        while(r < corr1 || r > corr2);
+
+       return {x:xValues, y: yValues, slope:slope, yint:yInt, r:r, corr:correlation, corX: corrX[selected], corY: corrY[selected],xScale: xScaleFactor[selected], yScale: yScaleFactor[selected]};
+    }
+    
+    function weakNeg(numDots){
+       
+       // determine the range of r values for the scatter plot
+       var corr1 = -0.6; 
+       var corr2 = -0.4; 
+       var correlation = "Weak Negative";
+       var xValues = [];
+       var yValues = [];
+       
+       var r = -2;
+       var lr;       
+       
+       // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
+       var corrX = ["Chicken Age","Weekly Exercise Hours","Hours on Social Media","Average Temperature (F)"];
+       var corrY = ["Egg Production (%)","Chances of Heart Attack (%)","Happiness","Monthly Heating Bill"];
+       
+       // this adjusts the x scale to count by this 
+       var xScaleFactor = [1,1,1,10];
+       
+       // this adjusts the y scale to count by this 
+       var yScaleFactor = [10,10,10,10]; // using a scale factor of 15 doesn't work well. 10 or less
+    
+       // pick a context index randomly from the list
+       var selected = random(0,corrX.length-1);
+       
+       // adjust this to change the corr coeff
+       var tol = 20;
+       var tempX, tempY;
+       
+       // keep generating x and y coordinates until the scatterplot is produced with a r value in the selected range
+       do{
+       
+           // pick a beginning point and an end point to force the relationship to be negative
+           var firstX = 0; 
+           var firstY = random(6*yScaleFactor[selected],10*yScaleFactor[selected]);
+           var lastX = random(8*xScaleFactor[selected],10*xScaleFactor[selected]);
+           var lastY = random(0,yScaleFactor[selected]);   
+           var slope, yInt;       
+       
+           // set the linear model based on these two points first. Then create the scatter plot based on this line
+           lr = linearRegression([firstX,lastX], [firstY,lastY]); // will reset this model later
+           slope = lr['slope']; 
+           yInt = lr['intercept']; 
+           
+           xValues = [];  // reset these each time
+           yValues = [];  // reset these each time
+           
+           for(var i = 0; i < numDots; i++){
+               
+               tempX = random(0,10*xScaleFactor[selected]);
+               xValues.push(tempX);
+               
+               var change = random(tol/5,tol);
+               
+               switch(random(0,11)){
+                  
+                  // add a point above the line
+                  case 0: case 1: case 2: case 3: case 4:
+                  tempY = round((slope*tempX+yInt+change)*10)/10;
+                  break;
+                  
+                  // add a point below
+                  case 5: case 6: case 7: case 8: case 9:
+                  tempY = round((slope*tempX+yInt-change)*10)/10;
+                  break;
+                  
+                  // add a point close to the line (or on it)
+                  case 10: case 11: 
+                  tempY = round(random(slope*tempX+yInt-tol, slope*tempX+yInt+tol)*10)/10;
+                  break;
+                  
+               } 
+               if(tempY < 0){ tempY = -1*tempY;}
+               yValues.push(tempY);              
+           }
+       
+         lr = linearRegression(xValues, yValues);
+         slope = lr['slope'];
+         yInt = lr['intercept'];
+         r = Math.sqrt(lr['r2']);
+         if(slope < 0){ r = r*-1};
+       }
+        while(r < corr1 || r > corr2);
+       
+       return {x:xValues, y: yValues, slope:slope, yint:yInt, r:r, corr:correlation, corX: corrX[selected], corY: corrY[selected],xScale: xScaleFactor[selected], yScale: yScaleFactor[selected]};
+    }
+    
+    function noCorr(numDots){
+       
+       // determine the range of r values for the scatter plot
+       var corr1 = -0.2; 
+       var corr2 = 0.2; 
+       var correlation = "No Correlation"; 
+       var xValues = [];
+       var yValues = [];
+       var r = -2;
+       var lr, slope, yInt;
+       
+       // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
+       var corrX = ["Age","Shoe Size","Number of Chickens","Temperature"];
+       var corrY = ["Exam Grade","Exam Grade","Number of Goats","Number of Birds"];
+       
+       // this adjusts the x scale to count by this 
+       var xScaleFactor = [10,1,10,10];
+       
+       // this adjusts the y scale to count by this 
+       var yScaleFactor = [10,10,10,10];
+     
+       // pick a context index randomly from the list
+       var selected = random(0,corrX.length-1);
+       
+       // keep generating x and y coordinates until the scatterplot is produced with a r value in the selected range
+       do{
+           
+           xValues = [];  // reset these each time
+           yValues = [];  // reset these each time
+           
+           for(var i = 0; i < numDots; i++){
+               xValues.push(random(0,10*xScaleFactor[selected]));
+               yValues.push(random(0,10*yScaleFactor[selected]));              
+           }
+       
+         lr = linearRegression(xValues, yValues);
+         slope = lr['slope'];
+         yInt = lr['intercept'];
+         r = Math.sqrt(lr['r2']);
+         if(slope < 0){ r = r*-1};
+       
+       }
+        while(r < corr1 || r > corr2);
+       
+       return {x:xValues, y: yValues, slope:slope, yint:yInt, r:r, corr:correlation, corX: corrX[selected], corY: corrY[selected], xScale: xScaleFactor[selected], yScale: yScaleFactor[selected]};
+    
+    }
+    
+    function weakPos(numDots){
+    
+       // determine the range of r values for the scatter plot
+       var corr1 = 0.4
+       var corr2 = 0.6
+       var correlation = "Weak Positive";
+       var xValues = [];
+       var yValues = [];
+       
+       var r = -2;
+       var lr;       
+       
+       // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
+       var corrX = ["Minutes Exercising","Shoe Size","Snowfall (in)","Time (hrs)","Hours Spent Studying","Dog Age","Temperature (F)", "Fat (g)"];
+       var corrY = ["Calories Burned","Height (in)", "Minutes Shovelling","Ice Cream Sales","Exam Grade","Dog Weight (lb)","Ice Cream Sales", "Calories"];
+       
+       // this adjusts the x scale to count by this 
+       var xScaleFactor = [1,1,1,1,1,1,10,2];
+       
+       // this adjusts the y scale to count by this 
+       var yScaleFactor = [10,7,10,5,10,10,5,10];
+       
+       // pick a context index randomly from the list
+       var selected = random(0,corrX.length-1);
+       
+       // adjust this to change the corr coeff
+       var tol = 20;
+       var tempX, tempY;
+       
+       // keep generating x and y coordinates until the scatterplot is produced with a r value in the selected range
+       do{
+       
+           // pick a beginning point and an end point to force the relationship to be positive
+           var firstX = 0;
+           var firstY = random(yScaleFactor[selected]/2,yScaleFactor[selected]);
+           var lastX = random(8*xScaleFactor[selected],10*xScaleFactor[selected]);
+           var lastY = random(5*yScaleFactor[selected],10*yScaleFactor[selected]);
+           var slope, yInt;       
+       
+           // set the linear model based on these two points first. Then create the scatter plot based on this line
+           lr = linearRegression([firstX,lastX], [firstY,lastY]); // will reset this model later
+           slope = lr['slope']; 
+           yInt = lr['intercept']; 
+           
+           xValues = [];  // reset these each time
+           yValues = [];  // reset these each time
+           
+           for(var i = 0; i < numDots; i++){
+               
+               tempX = random(0,10*xScaleFactor[selected]);
+               xValues.push(tempX);
+               var change = random(tol/5,tol);
+               
+               switch(random(0,12)){
+                  
+                  // add a point above the line
+                  case 0: case 1: case 2: case 3: case 4:
+                  tempY = round((slope*tempX+yInt+change)*10)/10;
+                  break;
+                  
+                  // add a point below
+                  case 5: case 6: case 7: case 8: case 9:
+                  tempY = round((slope*tempX+yInt-change)*10)/10;
+                  break;
+                  
+                  // add a point close to the line (or on it)
+                  case 10: case 11: case 12:
+                  tempY = round(random(slope*tempX+yInt-tol, slope*tempX+yInt+tol)*10)/10;
+                  break;
+                  
+               } 
+               if(tempY < 0){ tempY = -1*tempY;}
+               yValues.push(tempY);               
+           }
+       
+         lr = linearRegression(xValues, yValues);
+         slope = lr['slope'];
+         yInt = lr['intercept'];
+         r = Math.sqrt(lr['r2']);
+         if(slope < 0){ r = r*-1};
+       
+       }
+        while(r < corr1 || r > corr2);
+       
+       return {x:xValues, y: yValues, slope:slope, yint:yInt, r:r, corr:correlation, corX: corrX[selected], corY: corrY[selected], xScale: xScaleFactor[selected], yScale: yScaleFactor[selected]};
+       
+    }
+    
+    function strongPos(numDots){
+    
+       // determine the range of r values for the scatter plot
+       var corr1 = 0.75; 
+       var corr2 = 1; 
+       var correlation = "Strong Positive";
+       var xValues = [];
+       var yValues = [];
+       
+       var r = -2;
+       var lr;       
+       
+       // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
+       var corrX = ["Minutes Exercising","Shoe Size","Snowfall (in)","Time (hrs)","Hours Spent Studying","Dog Age","Temperature (F)", "Fat (g)"];
+       var corrY = ["Calories Burned","Height (in)", "Minutes Shovelling","Ice Cream Sales","Exam Grade","Dog Weight (lb)","Ice Cream Sales", "Calories"];
+       
+       // this adjusts the x scale to count by this 
+       var xScaleFactor = [1,1,1,1,1,1,10,2];
+       
+       // this adjusts the y scale to count by this 
+       var yScaleFactor = [10,7,10,5,10,10,5,10];
+       
+       // pick a context index randomly from the list
+       var selected = random(0,corrX.length-1);
+       
+       // adjust this to change the corr coeff
+       var tol = 2;
+       var tempX, tempY;
+       
+       // keep generating x and y coordinates until the scatterplot is produced with a r value in the selected range
+       do{
+           
+           // pick a beginning point and an end point to force the relationship to be positive
+           var firstX = 0;
+           var firstY = random(yScaleFactor[selected],5*yScaleFactor[selected]);
+           var lastX = random(8*xScaleFactor[selected],10*xScaleFactor[selected]);
+           var lastY = random(5*yScaleFactor[selected],10*yScaleFactor[selected]);
+           var slope, yInt;       
+       
+           // set the linear model based on these two points first. Then create the scatter plot based on this line
+           lr = linearRegression([firstX,lastX], [firstY,lastY]); // will reset this model later
+           slope = lr['slope']; 
+           yInt = lr['intercept']; 
+           
+           xValues = [];  // reset these each time
+           yValues = [];  // reset these each time
+           
+           for(var i = 0; i < numDots; i++){
+               
+               tempX = random(0,10*xScaleFactor[selected]);
+               xValues.push(tempX);
+               tempY = round(random(slope*tempX+yInt-tol, slope*tempX+yInt+tol)*10)/10;
+               if(tempY < 0){ tempY = -1*tempY;}
+               yValues.push(tempY);              
+           }
+       
+         lr = linearRegression(xValues, yValues);
+         slope = lr['slope'];
+         yInt = lr['intercept'];
+         r = Math.sqrt(lr['r2']);
+         if(slope < 0){ r = r*-1};
+       
+       }
+        while(r < corr1 || r > corr2);
+       
+       return {x:xValues, y: yValues, slope:slope, yint:yInt, r:r, corr:correlation, corX: corrX[selected], corY: corrY[selected], xScale: xScaleFactor[selected], yScale: yScaleFactor[selected]};
+       
+    }
+    
+    // function that draws the scatterplot with the line of best fit
+    function draw(line, scatterXs, scatterYs,plot, lineBoolean,xScale,yScale, xLabel, yLabel) {
+    try {
+      
+      // compile the expression once
+      var expr = math.compile(line)
+
+      // evaluate the expression repeatedly for different values of x
+      var xValues = math.range(-10, 12*xScale, 0.5).toArray();
+      const yValues = xValues.map(function (x) {
+        return expr.eval({x: x});
+      })       
+       
+      // render the line of best fit
+      var trace1 = {
+        x: xValues,
+        y: yValues,
+        type: 'scatter',
+        mode: 'lines',        
+        line: {
+          color: '#3F4591',
+          width: 2
+        },
+        name:"",
+      };
+      
+      // render the scatterplot
+      var trace2 = {
+        x: scatterXs,
+        y: scatterYs,
+        type: 'scatter',
+        mode: 'markers',
+        marker: {
+          color: '#3F4591',
+          size: 8
+        },
+        hoverinfo:'none'
+      };
+      
+      var x_axis_template ={
+        title: xLabel,
+        showgrid: true,
+        zeroline: true,
+        nticks: 12,
+        range: [0,11*xScale], 
+        gridcolor: '#bdbdbd', //grid color
+        gridwidth: 1.2, //grid width
+        zerolinecolor: 'black', // axes color
+        zerolinewidth: 1.5, // axes widths
+        tickfont: {
+          size: 14,
+       },
+      };
+      
+      var y_axis_template ={
+        title: yLabel,
+        showgrid: true,
+        zeroline: true,
+        nticks: 12,
+        range: [0,11*yScale], 
+        gridcolor: '#bdbdbd', //grid color
+        gridwidth: 1.2, //grid width
+        zerolinecolor: 'black', // axes color
+        zerolinewidth: 1.5, // axes widths
+        tickfont: {
+          size: 14,
+       },       
+      }; 
+      
+      // make grid smaller for mobile
+      var gridsize;
+      // gridsize= Math.min(.95*window.innerWidth,550);
+      
+      if(window.innerWidth > 601){
+         gridsize = 450;
+      }else{
+         gridsize = 325;
+      }
+      
+      var layout = {
+        xaxis:x_axis_template,
+        yaxis:y_axis_template,
+        showlegend: false,
+        width: gridsize,
+        height: gridsize,
+        hovermode: 'closest',   
+        font:{size: 18},
+        margin: {l: 60,  r: 30, t: 20,b:50}
+      };
+      
+      var data;
+      if(lineBoolean){
+      
+        data = [trace1,trace2];
+      
+      } else{
+      
+        data = [trace2];
+      }
+      Plotly.newPlot(plot, data, layout,{displayModeBar: false});
+    }
+    catch (err) {
+      console.error(err)
+      alert(err)
+    }
+  }
+  
+  // helper function which determines the equation for the line of best fit
+  function linearRegression(x,y){
+        var lr = {};
+        var n = y.length;
+        var sum_x = 0;
+        var sum_y = 0;
+        var sum_xy = 0;
+        var sum_xx = 0;
+        var sum_yy = 0;
+
+        for (var i = 0; i < y.length; i++) {
+
+            sum_x += x[i];
+            sum_y += y[i];
+            sum_xy += (x[i]*y[i]);
+            sum_xx += (x[i]*x[i]);
+            sum_yy += (y[i]*y[i]);
+        } 
+
+        lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);
+        lr['intercept'] = (sum_y - lr.slope * sum_x)/n;
+        lr['r2'] = Math.pow((n*sum_xy - sum_x*sum_y)/Math.sqrt((n*sum_xx-sum_x*sum_x)*(n*sum_yy-sum_y*sum_y)),2);
+
+        return lr;
+}
+</script>
