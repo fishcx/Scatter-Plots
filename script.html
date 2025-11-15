@@ -23,7 +23,8 @@
         if(!testing){$("#answer").hide(); $("#show-answer").val("Show Answer");}
         $('#plot').hide();
         $('#plot-line').hide();
-
+        $('#showLine').prop('checked', false); //reset show best fit line
+        
         var type;
         // handles the formatting for selecting any type
         if($("#type").val()=="any"){type = random(1,2);}
