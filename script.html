@@ -225,17 +225,17 @@
        var lr;       
        
        // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
-       var corrX = ["Number of Absences","Chicken Age","Weekly Exercise Hours","Hours Spent Watching TV","Hours on Social Media","Age","Average Temperature (F)"];
-       var corrY = ["Exam Grade","Egg Production (%)","Chances of Heart Attack (%)","Exam Grade","Happiness","Memory","Monthly Heating Bill"];
+       var corrX = ["Number of Absences","Chicken Age (years)","Weekly Exercise Hours","Hours Spent Watching TV","Travel Speed (mph)","Car's Age (years)","Average Temperature (F)"];
+       var corrY = ["Exam Grade","Egg Production (%)","Chances of Heart Attack (%)","Exam Grade (%)","Travel Time (seconds)","Resale Value ($)","Monthly Heating Bill ($)"];
        
        // this adjusts the x scale to count by this 
-       var xScaleFactor = [1,1,1,1,1,10,10];
+       var xScaleFactor = [1,1,1,1,10,1,10];
        
        // this adjusts the y scale to count by this 
-       var yScaleFactor = [10,10,10,10,10,10,15];
+       var yScaleFactor = [10,10,10,10,10,1000,15];
    
        // pick a context index randomly from the list
-       var selected = random(0,corrX.length-1);
+       var selected = random(0,corrX.length-1); 
        
        // adjust this to change the corr coeff
        var tol = 2;
