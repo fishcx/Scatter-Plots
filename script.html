@@ -428,14 +428,14 @@
        var lr;       
        
        // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
-       var corrX = ["Exercise Time (minutes)","Shoe Size","Snowfall (in)","Time (hours)","Hours Spent Studying","Dog Age (years)","Temperature (F)"];
-       var corrY = ["Calories Burned","Height (in)", "Minutes Shovelling","Ice Cream Sales","Exam Grade (%)","Dog Weight (lb)","Ice Cream Sales ($)"];
+       var corrX = ["Exercise Time (minutes)","Shoe Size","Snowfall (in)","Time (hours)","Hours Spent Studying","Temperature (F)"];
+       var corrY = ["Calories Burned","Height (in)", "Minutes Shovelling","Ice Cream Sales","Exam Grade (%)","Ice Cream Sales ($)"];
        
        // this adjusts the x scale to count by this 
-       var xScaleFactor = [1,1,1,1,1,1,10];
+       var xScaleFactor = [1,1,1,1,1,10];
        
        // this adjusts the y scale to count by this 
-       var yScaleFactor = [10,7,10,5,10,10,10];
+       var yScaleFactor = [10,7,10,5,10,10];
        
        // pick a context index randomly from the list
        var selected = random(0,corrX.length-1); 
@@ -516,17 +516,17 @@
        var lr;       
        
        // the indexes of these need to match up.  So corrX[0] should go with corrY[0]
-       var corrX = ["Minutes Exercising","Shoe Size","Snowfall (in)","Time (hours)","Hours Spent Studying","Dog Age","Temperature (F)"];
-       var corrY = ["Calories Burned","Height (in)", "Minutes Shovelling","Ice Cream Sales ($)","Exam Grade (%)","Dog Weight (lb)","Ice Cream Sales ($)"];
+       var corrX = ["Minutes Exercising","Shoe Size","Snowfall (in)","Time (hours)","Hours Spent Studying","Temperature (F)"];
+       var corrY = ["Calories Burned","Height (in)", "Minutes Shovelling","Ice Cream Sales ($)","Exam Grade (%)","Ice Cream Sales ($)"];
        
        // this adjusts the x scale to count by this 
-       var xScaleFactor = [1,1,1,1,1,1,10];
+       var xScaleFactor = [1,1,1,1,1,10];
        
        // this adjusts the y scale to count by this 
-       var yScaleFactor = [10,7,10,10,10,10,10];
+       var yScaleFactor = [10,7,10,10,10,10];
        
        // pick a context index randomly from the list
-       var selected = random(0,corrX.length-1); selected = 6;
+       var selected = random(0,corrX.length-1); 
        
        // adjust this to change the corr coeff
        var tol = 2;
