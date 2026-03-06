@@ -17,6 +17,7 @@
     $('#video-button').hide();
     $('#plot-line').hide();
     
+    var graph = false;
     var testing = false;
     
     $('#generate').click(function(){
@@ -27,9 +28,10 @@
         
         var type;
         // handles the formatting for selecting any type
-        if($("#type").val()=="any"){type = random(1,2);}
-        else{type = parseInt($("#type").val())}
-
+        //if($("#type").val()=="any"){type = random(1,2);}
+        //else{type = parseInt($("#type").val());}
+        type = parseInt($("#type").val());
+        
         generate(type);
      });
 
